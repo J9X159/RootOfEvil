@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RootOfEvil")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+405a9345675ca4bd01b2ccd23b5edfefe798a1fd")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a371140d038ec2f5be6cfbcc45c67123c7317d1a")]
 [assembly: System.Reflection.AssemblyProductAttribute("RootOfEvil")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RootOfEvil")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
