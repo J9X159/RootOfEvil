@@ -1,0 +1,14 @@
+C:\Users\pc2020\Desktop\RootOfEvil\bin\Debug\net9.0\RootOfEvil.exe
+C:\Users\pc2020\Desktop\RootOfEvil\bin\Debug\net9.0\RootOfEvil.deps.json
+C:\Users\pc2020\Desktop\RootOfEvil\bin\Debug\net9.0\RootOfEvil.runtimeconfig.json
+C:\Users\pc2020\Desktop\RootOfEvil\bin\Debug\net9.0\RootOfEvil.dll
+C:\Users\pc2020\Desktop\RootOfEvil\bin\Debug\net9.0\RootOfEvil.pdb
+C:\Users\pc2020\Desktop\RootOfEvil\obj\Debug\net9.0\RootOfEvil.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\pc2020\Desktop\RootOfEvil\obj\Debug\net9.0\RootOfEvil.AssemblyInfoInputs.cache
+C:\Users\pc2020\Desktop\RootOfEvil\obj\Debug\net9.0\RootOfEvil.AssemblyInfo.cs
+C:\Users\pc2020\Desktop\RootOfEvil\obj\Debug\net9.0\RootOfEvil.csproj.CoreCompileInputs.cache
+C:\Users\pc2020\Desktop\RootOfEvil\obj\Debug\net9.0\RootOfEvil.dll
+C:\Users\pc2020\Desktop\RootOfEvil\obj\Debug\net9.0\refint\RootOfEvil.dll
+C:\Users\pc2020\Desktop\RootOfEvil\obj\Debug\net9.0\RootOfEvil.pdb
+C:\Users\pc2020\Desktop\RootOfEvil\obj\Debug\net9.0\RootOfEvil.genruntimeconfig.cache
+C:\Users\pc2020\Desktop\RootOfEvil\obj\Debug\net9.0\ref\RootOfEvil.dll
