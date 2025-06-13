@@ -12,3 +12,18 @@ C:\Users\pc2020\Desktop\RootOfEvil\obj\Debug\net9.0\refint\RootOfEvil.dll
 C:\Users\pc2020\Desktop\RootOfEvil\obj\Debug\net9.0\RootOfEvil.pdb
 C:\Users\pc2020\Desktop\RootOfEvil\obj\Debug\net9.0\RootOfEvil.genruntimeconfig.cache
 C:\Users\pc2020\Desktop\RootOfEvil\obj\Debug\net9.0\ref\RootOfEvil.dll
+f:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\bin\Debug\net9.0\RootOfEvil.exe
+F:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\bin\Debug\net9.0\RootOfEvil.deps.json
+F:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\bin\Debug\net9.0\RootOfEvil.runtimeconfig.json
+f:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\bin\Debug\net9.0\RootOfEvil.dll
+f:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\bin\Debug\net9.0\RootOfEvil.pdb
+f:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\obj\Debug\net9.0\RootOfEvil.GeneratedMSBuildEditorConfig.editorconfig
+f:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\obj\Debug\net9.0\RootOfEvil.AssemblyInfoInputs.cache
+f:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\obj\Debug\net9.0\RootOfEvil.AssemblyInfo.cs
+f:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\obj\Debug\net9.0\RootOfEvil.csproj.CoreCompileInputs.cache
+f:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\obj\Debug\net9.0\RootOfEvil.sourcelink.json
+f:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\obj\Debug\net9.0\RootOfEvil.dll
+f:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\obj\Debug\net9.0\refint\RootOfEvil.dll
+f:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\obj\Debug\net9.0\RootOfEvil.pdb
+F:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\obj\Debug\net9.0\RootOfEvil.genruntimeconfig.cache
+F:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\obj\Debug\net9.0\ref\RootOfEvil.dll
