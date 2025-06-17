@@ -27,3 +27,4 @@ f:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\obj\Debug\net9.0\refi
 f:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\obj\Debug\net9.0\RootOfEvil.pdb
 F:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\obj\Debug\net9.0\RootOfEvil.genruntimeconfig.cache
 F:\Smaczna kawa binarna\WorkSheet\MildranGierka\RootOfEvil\obj\Debug\net9.0\ref\RootOfEvil.dll
+c:\Users\pc2020\Desktop\RootOfEvil\obj\Debug\net9.0\RootOfEvil.sourcelink.json
