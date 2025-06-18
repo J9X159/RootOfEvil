@@ -242,10 +242,17 @@ class Program
         if (totalPages > 1)
             Console.WriteLine(itemFocus == ItemFocus.Page ? $"   < page {currentPage + 1}/{totalPages} >" : $"   page {currentPage + 1}/{totalPages}");
         else
-            Console.WriteLine("   page 1/1\n");
+            Console.WriteLine("   page 1/1");
+
 
         if (itemFocus == ItemFocus.Item && GetPageItems().Count > 0)
-            Console.WriteLine(itemFocus == ItemFocus.Item ? $"                                [A] - description" : $"\n");
+        {
+            Console.WriteLine("                                [A] - description");
+        }
+        else
+        {
+            Console.WriteLine("");
+        }
 
         var pageItems = GetPageItems();
         for (int i = 0; i < pageItems.Count; i++)
