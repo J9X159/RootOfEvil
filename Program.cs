@@ -244,8 +244,15 @@ class Program
         else
             Console.WriteLine("   page 1/1");
 
+
         if (itemFocus == ItemFocus.Item && GetPageItems().Count > 0)
+        {
             Console.WriteLine("                                [A] - description");
+        }
+        else
+        {
+            Console.WriteLine("");
+        }
 
         var pageItems = GetPageItems();
         for (int i = 0; i < pageItems.Count; i++)
