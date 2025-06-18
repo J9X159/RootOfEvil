@@ -7,48 +7,50 @@ using System.Threading.Tasks;
 
 namespace Root_of_Evil
 {
-    internal class Program
+    enum Tab { Stats, Items, Skills, Quests, Settings }
+enum ItemFocus { Title, Sort, Page, Item }
+enum ItemSortMode { Default, Alphabetical }
+
+class Item
+{
+    public string Name;
+    public string Description;
+    public int Quantity;
+
+    public Item(string name, string description, int quantity)
     {
-        enum Tab
-        {
-            Stats,Items,Skills,Quests,Settings
-        }
-        enum ItemFocus
-        {
-            Title, Sort, Page, Item
-        }
-
-       class Item
-    {
-        public string Name;
-        public string Description;
-        public int Quantity;
-
-        public Item(string name, string description, int quantity)
-        {
-            Name = name;
-            Description = description;
-            Quantity = quantity;
-        }
-
-        public string DisplayName => $"({Quantity}) {Name}";
+        Name = name;
+        Description = description;
+        Quantity = quantity;
     }
 
+    public string DisplayName => $"({Quantity}) {Name}";
+}
+
+class Program
+{
     static List<Item> items = new List<Item>
     {
         new Item("Beer «Baltika9»", "Zaspokaja pragnienie, przywraca +10 HP", 2),
         new Item("Chips «Doritos»", "Smaczna przekąska. Dodaje +10 do szczęścia.", 1),
         new Item("Stimpak", "Zatrzymuje krwawienie. Przywraca 15 HP", 5),
+        new Item("Water", "Orzeźwiająca woda źródlana", 1),
+        new Item("Candy Bar", "Daje dużo energii", 1),
+        new Item("Painkillers", "Redukuje ból", 2),
     };
 
     static int selectedItemIndex = 0;
     static ItemFocus itemFocus = ItemFocus.Title;
     static bool viewingItemDescription = false;
+    static int currentPage = 0;
+    static ItemSortMode currentSort = ItemSortMode.Default;
+
+    const int ITEMS_PER_PAGE = 5;
 
     static void Main()
     {
         List<Tab> tabs = new List<Tab> { Tab.Stats, Tab.Items, Tab.Skills, Tab.Quests, Tab.Settings };
-        int currentIndex = 0;
+        int currentTabIndex = 1;
 
         Console.CursorVisible = false;
         bool running = true;
@@ -60,87 +62,62 @@ namespace Root_of_Evil
             if (viewingItemDescription)
             {
                 DrawItemDescription();
-                var key = Console.ReadKey(true);
-                if (key.Key == ConsoleKey.D)
+                var KEY = Console.ReadKey(true);
+                if (KEY.Key == ConsoleKey.D)
                     viewingItemDescription = false;
                 continue;
             }
 
-            switch (tabs[currentIndex])
+            switch (tabs[currentTabIndex])
             {
-                case Tab.Stats:
-                    DrawStats();
-                    break;
-                case Tab.Items:
-                    DrawItems();
-                    break;
-                case Tab.Skills:
-                    DrawSkills();
-                    break;
-                case Tab.Quests:
-                    DrawQuests();
-                    break;
-                case Tab.Settings:
-                    DrawSettings();
-                    break;
+                case Tab.Stats: DrawStats(); break;
+                case Tab.Items: DrawItems(); break;
+                case Tab.Skills: DrawSkills(); break;
+                case Tab.Quests: DrawQuests(); break;
+                case Tab.Settings: DrawSettings(); break;
             }
 
-            var keyInput = Console.ReadKey(true);
+            var key = Console.ReadKey(true);
 
-           bool isInItemsTab = tabs[currentIndex] == Tab.Items;
-
-if (isInItemsTab)
-{
-    // Obsługa klawiszy A/D dla zmiany zakładek w Items,
-    // ale tylko jeśli nie jesteś na przedmiocie
-    if ((itemFocus != ItemFocus.Item || items.Count == 0) && (keyInput.Key == ConsoleKey.A || keyInput.Key == ConsoleKey.D))
-    {
-        if (keyInput.Key == ConsoleKey.A && currentIndex > 0) currentIndex--;
-        else if (keyInput.Key == ConsoleKey.D && currentIndex < tabs.Count - 1) currentIndex++;
-
-        // Reset focus przy zmianie zakładki
-        itemFocus = ItemFocus.Title;
-        selectedItemIndex = 0;
-    }
-    else
-    {
-        HandleItemsInput(keyInput);
-    }
-}
-else
-{
-    switch (keyInput.Key)
-    {
-        case ConsoleKey.A:
-            if (currentIndex > 0) currentIndex--;
-            break;
-        case ConsoleKey.D:
-            if (currentIndex < tabs.Count - 1) currentIndex++;
-            break;
-        case ConsoleKey.Escape:
-            running = false;
-            break;
-    }
-
-    // Reset focus przy wejściu do innej zakładki
-    itemFocus = ItemFocus.Title;
-    selectedItemIndex = 0;
-}
+            if (tabs[currentTabIndex] == Tab.Items)
+            {
+                HandleItemsInput(key, tabs, ref currentTabIndex);
+            }
+            else
+            {
+                switch (key.Key)
+                {
+                    case ConsoleKey.A:
+                        if (currentTabIndex > 0) currentTabIndex--;
+                        break;
+                    case ConsoleKey.D:
+                        if (currentTabIndex < tabs.Count - 1) currentTabIndex++;
+                        break;
+                    case ConsoleKey.Escape:
+                        running = false;
+                        break;
+                }
+                itemFocus = ItemFocus.Title;
+                selectedItemIndex = 0;
+                currentPage = 0;
+            }
         }
 
         Console.Clear();
         Console.WriteLine("Zamknięto.");
     }
 
-    static void HandleItemsInput(ConsoleKeyInfo key)
+    static void HandleItemsInput(ConsoleKeyInfo key, List<Tab> tabs, ref int currentTabIndex)
     {
+        int maxPage = (int)Math.Ceiling(GetSortedItems().Count / (double)ITEMS_PER_PAGE);
+
         switch (key.Key)
         {
             case ConsoleKey.S:
                 if (itemFocus == ItemFocus.Title) itemFocus = ItemFocus.Sort;
-                else if (itemFocus == ItemFocus.Sort) itemFocus = ItemFocus.Page;
-                else if (itemFocus == ItemFocus.Page && items.Count > 0) itemFocus = ItemFocus.Item;
-                else if (itemFocus == ItemFocus.Item && selectedItemIndex < items.Count - 1)
+                else if (itemFocus == ItemFocus.Sort) itemFocus = (maxPage > 1) ? ItemFocus.Page : ItemFocus.Item;
+                else if (itemFocus == ItemFocus.Page && maxPage > 1) itemFocus = ItemFocus.Item;
+                else if (itemFocus == ItemFocus.Item && selectedItemIndex < ITEMS_PER_PAGE - 1)
                     selectedItemIndex++;
                 break;
 
@@ -153,38 +130,79 @@ else
                 break;
 
             case ConsoleKey.A:
-                if (itemFocus == ItemFocus.Item && items.Count > 0)
+                if (itemFocus == ItemFocus.Sort)
+                    currentSort = ItemSortMode.Default;
+                else if (itemFocus == ItemFocus.Page && currentPage > 0)
+                    currentPage--;
+                else if (itemFocus == ItemFocus.Item && GetPageItems().Count > 0)
                     viewingItemDescription = true;
+                else if (itemFocus != ItemFocus.Item)
+                {
+                    if (currentTabIndex > 0) currentTabIndex--;
+                    itemFocus = ItemFocus.Title;
+                    selectedItemIndex = 0;
+                    currentPage = 0;
+                }
+                break;
+
+            case ConsoleKey.D:
+                if (itemFocus == ItemFocus.Sort)
+                    currentSort = ItemSortMode.Alphabetical;
+                else if (itemFocus == ItemFocus.Page && currentPage < maxPage - 1)
+                    currentPage++;
+                else if (itemFocus != ItemFocus.Item)
+                {
+                    if (currentTabIndex < tabs.Count - 1) currentTabIndex++;
+                    itemFocus = ItemFocus.Title;
+                    selectedItemIndex = 0;
+                    currentPage = 0;
+                }
                 break;
 
             case ConsoleKey.Enter:
-                if (itemFocus == ItemFocus.Item && items.Count > 0)
+                if (itemFocus == ItemFocus.Item && GetPageItems().Count > 0)
                 {
-                    items[selectedItemIndex].Quantity--;
-                    if (items[selectedItemIndex].Quantity <= 0)
-                        items.RemoveAt(selectedItemIndex);
+                    var currentItem = GetPageItems()[selectedItemIndex];
+                    currentItem.Quantity--;
+                    if (currentItem.Quantity <= 0)
+                    {
+                        items.Remove(currentItem);
+                        if (selectedItemIndex >= GetPageItems().Count)
+                            selectedItemIndex = Math.Max(0, GetPageItems().Count - 1);
+                    }
 
-                    if (selectedItemIndex >= items.Count)
-                        selectedItemIndex = Math.Max(0, items.Count - 1);
-
-                   if (items.Count == 0)
-{
-    itemFocus = ItemFocus.Page;
-    selectedItemIndex = 0;
-}
+                    if (items.Count == 0)
+                    {
+                        itemFocus = ItemFocus.Title;
+                        selectedItemIndex = 0;
+                        currentPage = 0;
+                    }
                 }
                 break;
         }
     }
 
-        static void DrawStats()
-        {
-            Console.WriteLine("\n");
-            Console.WriteLine("                          STATS ]>\n");
-            Console.WriteLine("\n");
-            Console.WriteLine("   Health : 100 / 100\n");
-            Console.WriteLine("   Rad : 0");
-        }
+    static List<Item> GetSortedItems()
+    {
+        return currentSort == ItemSortMode.Alphabetical
+            ? items.OrderBy(i => i.Name).ToList()
+            : new List<Item>(items);
+    }
+
+    static List<Item> GetPageItems()
+    {
+        var sorted = GetSortedItems();
+        return sorted.Skip(currentPage * ITEMS_PER_PAGE).Take(ITEMS_PER_PAGE).ToList();
+    }
+
+    static void DrawStats()
+    {
+        Console.WriteLine("\n");
+        Console.WriteLine("                          STATS ]>\n");
+        Console.WriteLine("\n");
+        Console.WriteLine("   Health : 100 / 100\n");
+        Console.WriteLine("   Rad : 0");
+    }
 
     static void DrawSkills()
     {
@@ -203,50 +221,55 @@ else
         Console.WriteLine("\n               <[ QUESTS ]>\n");
     }
 
-    static void DrawSettings() {
-            Console.WriteLine("\n");
-            Console.WriteLine("                     <[ SETTINGS \n");
-            Console.WriteLine("   Color"); }
+    static void DrawSettings()
+    {
+        Console.WriteLine("\n");
+        Console.WriteLine("                     <[ SETTINGS \n");
+        Console.WriteLine("   Color");
+    }
 
     static void DrawItems()
     {
         Console.WriteLine("\n");
-        Console.WriteLine(itemFocus == ItemFocus.Title ? "                       <[ ITEMS ]>\n" :                                                "                          ITEMS\n");
-        Console.WriteLine(itemFocus == ItemFocus.Sort ?  "                    < Sort : default >" : "                        Sort : default");
-        Console.WriteLine(itemFocus == ItemFocus.Page ? "   < page 1/1 >" : "   page 1/1");
+        Console.WriteLine(itemFocus == ItemFocus.Title ?
+                          "                       <[ ITEMS ]>\n" : "                          ITEMS\n");
 
-        if (items.Count == 0)
-        {
-            
-        }
+        string sortLine = currentSort == ItemSortMode.Default ? "default" : "alphabetical";
+        Console.WriteLine(itemFocus == ItemFocus.Sort ?
+                         $"                    < Sort : {sortLine} >" : $"                      Sort : {sortLine}");
+
+        int totalPages = (int)Math.Ceiling(GetSortedItems().Count / (double)ITEMS_PER_PAGE);
+        if (totalPages > 1)
+            Console.WriteLine(itemFocus == ItemFocus.Page ? $"   < page {currentPage + 1}/{totalPages} >" : $"   page {currentPage + 1}/{totalPages}");
         else
-        {
-            for (int i = 0; i < items.Count; i++)
-            {
-                if (itemFocus == ItemFocus.Item && i == selectedItemIndex)
-                    Console.WriteLine($"   < {items[i].DisplayName} >");
-                else
-                    Console.WriteLine($"   {items[i].DisplayName}");
-            }
+            Console.WriteLine("   page 1/1");
 
-            if (itemFocus == ItemFocus.Item)
-                Console.WriteLine("\n                                [A] - description  ");
+        if (itemFocus == ItemFocus.Item && GetPageItems().Count > 0)
+            Console.WriteLine("                                [A] - description");
+
+        var pageItems = GetPageItems();
+        for (int i = 0; i < pageItems.Count; i++)
+        {
+            if (itemFocus == ItemFocus.Item && i == selectedItemIndex)
+                Console.WriteLine($"   < {pageItems[i].DisplayName} >");
+            else
+                Console.WriteLine($"   {pageItems[i].DisplayName}");
         }
 
-       
+        if (pageItems.Count == 0)
+            Console.WriteLine("");
     }
 
     static void DrawItemDescription()
     {
-        var item = items[selectedItemIndex];
+        var item = GetPageItems()[selectedItemIndex];
         Console.Clear();
-        
+        Console.WriteLine("\n");
         Console.WriteLine($"  {item.DisplayName}\n");
         Console.WriteLine($"  {item.Description}");
         Console.WriteLine("\n  [D] - wróć");
     }
 }
-
 
    /*
 
