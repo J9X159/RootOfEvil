@@ -236,7 +236,7 @@ class Program
 
         string sortLine = currentSort == ItemSortMode.Default ? "default" : "alphabetical";
         Console.WriteLine(itemFocus == ItemFocus.Sort ?
-                         $"                    < Sort : {sortLine} >" : $"                      Sort : {sortLine}");
+                         $"                    < Sort : {sortLine} >" : $"                    Sort : {sortLine}");
 
         int totalPages = (int)Math.Ceiling(GetSortedItems().Count / (double)ITEMS_PER_PAGE);
         if (totalPages > 1)
