@@ -236,16 +236,16 @@ class Program
 
         string sortLine = currentSort == ItemSortMode.Default ? "default" : "alphabetical";
         Console.WriteLine(itemFocus == ItemFocus.Sort ?
-                         $"                    < Sort : {sortLine} >" : $"                      Sort : {sortLine}");
+                         $"                    < Sort : {sortLine} >" : $"                    Sort : {sortLine}");
 
         int totalPages = (int)Math.Ceiling(GetSortedItems().Count / (double)ITEMS_PER_PAGE);
         if (totalPages > 1)
             Console.WriteLine(itemFocus == ItemFocus.Page ? $"   < page {currentPage + 1}/{totalPages} >" : $"   page {currentPage + 1}/{totalPages}");
         else
-            Console.WriteLine("   page 1/1");
+            Console.WriteLine("   page 1/1\n");
 
         if (itemFocus == ItemFocus.Item && GetPageItems().Count > 0)
-            Console.WriteLine("                                [A] - description");
+            Console.WriteLine(itemFocus == ItemFocus.Item ? $"                                [A] - description" : $"\n");
 
         var pageItems = GetPageItems();
         for (int i = 0; i < pageItems.Count; i++)
