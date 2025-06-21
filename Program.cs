@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
-
-namespace Root_of_Evil
+enum Tab
 {
-    enum Tab { Stats, Items, Skills, Quests, Settings }
+    Stats, Items, Skills, Quests, Shops, Settings
+}
+
 enum ItemFocus { Title, Sort, Page, Item }
 enum ItemSortMode { Default, Alphabetical }
+enum SkillsFocus { Title, Skill }
 
 class Item
 {
@@ -47,64 +48,292 @@ class Program
 
     const int ITEMS_PER_PAGE = 5;
 
-    static void Main()
+    static SkillsFocus skillsFocus = SkillsFocus.Title;
+    static bool viewingSkillDescription = false;
+
+    static int hackLevel = 2;
+    static int craftLevel = 0;
+    static int survivalLevel = 2;
+
+    static int level = 4;
+    static int xp = 10;
+    static int remainingPoints = 3;
+  private static int selectedSkillIndex;
+
+  static void Main()
     {
-        List<Tab> tabs = new List<Tab> { Tab.Stats, Tab.Items, Tab.Skills, Tab.Quests, Tab.Settings };
-        int currentTabIndex = 1;
+        ShowIntro();
 
-        Console.CursorVisible = false;
-        bool running = true;
-
-        while (running)
+        static void ShowIntro()
         {
             Console.Clear();
-
-            if (viewingItemDescription)
+            string[] intro = new string[]
             {
-                DrawItemDescription();
-                var KEY = Console.ReadKey(true);
-                if (KEY.Key == ConsoleKey.D)
-                    viewingItemDescription = false;
-                continue;
-            }
+                "\n",
+                "                     THE STORY BEGINS",
+                "\n",
+                "   ====================================================\n",
+                "   First of the three heroes was Amadeus, a wizard. Not\n",
+                "   Perhaps the bravest or the most powerful, but he was\n",
+                "   clever and sensible\n",
+                "\n",
+                "   Then there was Pontius the knight, fearless protector\n",
+                "   of the realm, who loved good food, drink and battle.\n",
+                "\n",
+                "   Last but not least was Zoya, a thief. She was\n",
+                "   mysterious and only seen as a passing shadow on a\n",
+                "   cloudy night.\n"
+            };
 
-            switch (tabs[currentTabIndex])
+            foreach (string line in intro)
             {
-                case Tab.Stats: DrawStats(); break;
-                case Tab.Items: DrawItems(); break;
-                case Tab.Skills: DrawSkills(); break;
-                case Tab.Quests: DrawQuests(); break;
-                case Tab.Settings: DrawSettings(); break;
-            }
-
-            var key = Console.ReadKey(true);
-
-            if (tabs[currentTabIndex] == Tab.Items)
-            {
-                HandleItemsInput(key, tabs, ref currentTabIndex);
-            }
-            else
-            {
-                switch (key.Key)
+                foreach (char c in line)
                 {
-                    case ConsoleKey.A:
-                        if (currentTabIndex > 0) currentTabIndex--;
-                        break;
-                    case ConsoleKey.D:
-                        if (currentTabIndex < tabs.Count - 1) currentTabIndex++;
-                        break;
-                    case ConsoleKey.Escape:
-                        running = false;
-                        break;
+                    Console.Write(c);
+                    Thread.Sleep(2);
                 }
-                itemFocus = ItemFocus.Title;
-                selectedItemIndex = 0;
-                currentPage = 0;
+                Console.WriteLine();
             }
-        }
 
-        Console.Clear();
-        Console.WriteLine("Zamknięto.");
+            Thread.Sleep(2500);
+
+            Console.WriteLine("\n   Press ENTER to continue...");
+            Console.ReadLine();
+            Console.Clear();
+
+            List<Tab> tabs = new List<Tab> { Tab.Stats, Tab.Items, Tab.Skills, Tab.Quests, Tab.Shops, Tab.Settings };
+            int currentTabIndex = 0;
+
+            Console.CursorVisible = false;
+            bool running = true;
+
+            while (running)
+            {
+                Console.Clear();
+
+                if (viewingSkillDescription)
+{
+    DrawSkillDescription();
+    var KEY = Console.ReadKey(true);
+    HandleSkillsInput(KEY, tabs, ref currentTabIndex);
+    continue;
+}
+
+                if (viewingSkillDescription)
+                {
+                    DrawSkillDescription();
+                    var key = Console.ReadKey(true);
+                    if (key.Key == ConsoleKey.A)
+                        viewingSkillDescription = false;
+                    continue;
+                }
+
+                switch (tabs[currentTabIndex])
+                {
+                    case Tab.Stats: DrawStats(); break;
+                    case Tab.Items: DrawItems(); break;
+                    case Tab.Skills: DrawSkills(); break;
+                    case Tab.Quests: DrawQuests(); break;
+                    case Tab.Shops: DrawShops(); break;
+                    case Tab.Settings: DrawSettings(); break;
+                }
+
+                var keyInput = Console.ReadKey(true);
+
+                if (tabs[currentTabIndex] == Tab.Items)
+                    HandleItemsInput(keyInput, tabs, ref currentTabIndex);
+                else if (tabs[currentTabIndex] == Tab.Skills)
+                    HandleSkillsInput(keyInput, tabs, ref currentTabIndex);
+                else
+                {
+                    switch (keyInput.Key)
+                    {
+                        case ConsoleKey.A:
+                            if (currentTabIndex > 0) currentTabIndex--;
+                            break;
+                        case ConsoleKey.D:
+                            if (currentTabIndex < tabs.Count - 1) currentTabIndex++;
+                            break;
+                        case ConsoleKey.Escape:
+                            running = false;
+                            break;
+                    }
+
+                    itemFocus = ItemFocus.Title;
+                    selectedItemIndex = 0;
+                    currentPage = 0;
+                }
+            }
+
+            Console.Clear();
+            Console.WriteLine("Zamknięto.");
+        }
+    }
+
+   static void HandleSkillsInput(ConsoleKeyInfo key, List<Tab> tabs, ref int currentTabIndex)
+{
+    if (viewingSkillDescription)
+    {
+        // Tylko to ma działać, gdy jesteśmy w opisie
+        if (key.Key == ConsoleKey.D)
+        {
+            viewingSkillDescription = false;
+        }
+        return;
+    }
+
+    switch (key.Key)
+    {
+        case ConsoleKey.S:
+            if (skillsFocus == SkillsFocus.Title)
+            {
+                skillsFocus = SkillsFocus.Skill;
+                selectedSkillIndex = 0;
+            }
+            else if (skillsFocus == SkillsFocus.Skill)
+            {
+                selectedSkillIndex = (selectedSkillIndex + 1) % 3;
+            }
+            break;
+
+        case ConsoleKey.W:
+            if (skillsFocus == SkillsFocus.Skill)
+            {
+                selectedSkillIndex = (selectedSkillIndex + 2) % 3; // wrap around
+            }
+            else if (skillsFocus == SkillsFocus.Skill)
+            {
+                skillsFocus = SkillsFocus.Title;
+            }
+            break;
+
+        case ConsoleKey.A:
+            if (skillsFocus == SkillsFocus.Skill)
+            {
+                viewingSkillDescription = true;
+            }
+            else if (skillsFocus == SkillsFocus.Title && currentTabIndex > 0)
+            {
+                currentTabIndex--;
+                skillsFocus = SkillsFocus.Title;
+            }
+            break;
+
+        case ConsoleKey.D:
+            if (skillsFocus == SkillsFocus.Title && currentTabIndex < tabs.Count - 1)
+            {
+                currentTabIndex++;
+                skillsFocus = SkillsFocus.Title;
+            }
+            break;
+
+        case ConsoleKey.Enter:
+            if (skillsFocus == SkillsFocus.Skill && remainingPoints > 0)
+            {
+                switch (selectedSkillIndex)
+                {
+                    case 0: hackLevel++; break;
+                    case 1: craftLevel++; break;
+                    case 2: survivalLevel++; break;
+                }
+                remainingPoints--;
+
+                // Reset focus, żeby można było zmieniać zakładki
+                skillsFocus = SkillsFocus.Title;
+                selectedSkillIndex = 0;
+            }
+            break;
+    }
+}
+
+
+    static void DrawSkillDescription()
+{
+    Console.Clear();
+    string skillName = selectedSkillIndex switch
+    {
+        0 => "Hack",
+        1 => "Craft",
+        2 => "Survival",
+        _ => ""
+    };
+
+    string description = selectedSkillIndex switch
+    {
+        0 => "Hack: Pozwala włamywać się do systemów i terminali.",
+        1 => "Craft: Umożliwia tworzenie przedmiotów i ulepszeń.",
+        2 => "Survival: Zwiększa odporność, szansę na przetrwanie.",
+        _ => ""
+    };
+
+    Console.WriteLine($"\n  {skillName.ToUpper()}");
+    Console.WriteLine($"\n  {description}");
+    Console.WriteLine("\n  [D] - wróć");
+}
+
+    static void DrawStats()
+    {
+        Console.WriteLine("\n");
+        Console.WriteLine("                          STATS ]>\n");
+        Console.WriteLine("\n");
+        Console.WriteLine("   Health : 100 / 100\n");
+        Console.WriteLine("   Magicka : 100 / 100\n");
+        Console.WriteLine("   Gold: 0");
+    }
+
+    static void DrawSkills()
+{
+    if (viewingSkillDescription)
+    {
+        DrawSkillDescription();
+        return;
+    }
+
+    Console.WriteLine("\n");
+    Console.WriteLine(skillsFocus == SkillsFocus.Title
+        ? "                      <[ SKILLS ]>\n"
+        : "                         SKILLS\n");
+
+    Console.WriteLine($"                      * level : {level}");
+    Console.WriteLine($"                     * xp : {xp}/500");
+    Console.WriteLine($"                  * remain points : {remainingPoints}\n");
+
+    void DrawSkill(string name, int level, int index)
+    {
+        string prefix = (skillsFocus == SkillsFocus.Skill && selectedSkillIndex == index) ? "< " : "  ";
+        string suffix = (skillsFocus == SkillsFocus.Skill && selectedSkillIndex == index) ? " >" : "";
+        Console.WriteLine($"   {prefix}{name} : {level}{suffix}");
+    }
+
+    DrawSkill("Hack", hackLevel, 0);
+    DrawSkill("Craft", craftLevel, 1);
+    DrawSkill("Survival", survivalLevel, 2);
+
+    Console.WriteLine();
+
+    if (skillsFocus == SkillsFocus.Skill)
+        Console.WriteLine("   [ENTER] - Ulepsz | [A] - Opis");
+}
+
+
+    static void DrawQuests()
+    {
+        Console.WriteLine("\n");
+        Console.WriteLine("                       <[ QUESTS ]>\n");
+        Console.WriteLine("   Main");
+    }
+
+    static void DrawShops()
+    {
+        Console.WriteLine("\n");
+        Console.WriteLine("                       <[ SHOPS ]>\n");
+    }
+
+    static void DrawSettings()
+    {
+        Console.WriteLine("\n");
+        Console.WriteLine("                       <[ SETTINGS \n");
+        Console.WriteLine("   Color");
     }
 
     static void HandleItemsInput(ConsoleKeyInfo key, List<Tab> tabs, ref int currentTabIndex)
@@ -195,48 +424,14 @@ class Program
         return sorted.Skip(currentPage * ITEMS_PER_PAGE).Take(ITEMS_PER_PAGE).ToList();
     }
 
-    static void DrawStats()
-    {
-        Console.WriteLine("\n");
-        Console.WriteLine("                          STATS ]>\n");
-        Console.WriteLine("\n");
-        Console.WriteLine("   Health : 100 / 100\n");
-        Console.WriteLine("   Rad : 0");
-    }
-
-    static void DrawSkills()
-    {
-        Console.WriteLine("\n");
-        Console.WriteLine("                      <[ SKILLS ]>\n");
-        Console.WriteLine("                      * level : 4  ");
-        Console.WriteLine("                     * xp : 10/500");
-        Console.WriteLine("                  * remain points : 0\n");
-        Console.WriteLine("   Hack : 2");
-        Console.WriteLine("   Craft : 0");
-        Console.WriteLine("   Survival : 2\n");
-    }
-
-    static void DrawQuests()
-    {
-        Console.WriteLine("\n               <[ QUESTS ]>\n");
-    }
-
-    static void DrawSettings()
-    {
-        Console.WriteLine("\n");
-        Console.WriteLine("                     <[ SETTINGS \n");
-        Console.WriteLine("   Color");
-    }
-
     static void DrawItems()
     {
         Console.WriteLine("\n");
-        Console.WriteLine(itemFocus == ItemFocus.Title ?
-                          "                       <[ ITEMS ]>\n" : "                          ITEMS\n");
+        Console.WriteLine(itemFocus == ItemFocus.Title ? "                       <[ ITEMS ]>\n" : "                          ITEMS\n");
 
         string sortLine = currentSort == ItemSortMode.Default ? "default" : "alphabetical";
         Console.WriteLine(itemFocus == ItemFocus.Sort ?
-                         $"                    < Sort : {sortLine} >" : $"                    Sort : {sortLine}");
+            $"                    < Sort : {sortLine} >" : $"                    Sort : {sortLine}");
 
         int totalPages = (int)Math.Ceiling(GetSortedItems().Count / (double)ITEMS_PER_PAGE);
         if (totalPages > 1)
@@ -244,15 +439,10 @@ class Program
         else
             Console.WriteLine("   page 1/1");
 
-
         if (itemFocus == ItemFocus.Item && GetPageItems().Count > 0)
-        {
             Console.WriteLine("                                [A] - description");
-        }
         else
-        {
             Console.WriteLine("");
-        }
 
         var pageItems = GetPageItems();
         for (int i = 0; i < pageItems.Count; i++)
@@ -278,154 +468,157 @@ class Program
     }
 }
 
-   /*
 
-            Console.WriteLine(
-                "\n              WELCOME TO SHVA145!\r\n            " +
-                "\r\n           (press [LMB] to continue)\r\n   " +
-                "\n   Controls:\n   " +
-                "[W][A][S][D] – scroll through the menu.\n" +
-                "   [LMB] – action/confirm/apply\n   " +
-                "[RMB] – back/close\n");
-            Console.ReadKey(true);
+        /*
+
+                 Console.WriteLine(
+                     "\n              WELCOME TO SHVA145!\r\n            " +
+                     "\r\n           (press [LMB] to continue)\r\n   " +
+                     "\n   Controls:\n   " +
+                     "[W][A][S][D] – scroll through the menu.\n" +
+                     "   [LMB] – action/confirm/apply\n   " +
+                     "[RMB] – back/close\n");
+                 Console.ReadKey(true);
 
 
-              List<string> postacie = new List<string> { "Uczeń", "Maturzysta", "Profesor" };
-        int selectedIndex = 0;
-        bool showMenu = true;
+                   List<string> postacie = new List<string> { "Uczeń", "Maturzysta", "Profesor" };
+             int selectedIndex = 0;
+             bool showMenu = true;
 
-        Console.CursorVisible = false;
+             Console.CursorVisible = false;
 
-        while (true)
-        {
-            if (showMenu)
-            {
-                Console.Clear();
-                Console.WriteLine("                   SELECT A CHARACTER\n");
-                    Console.WriteLine("                      [A]-Description");
-                for (int i = 0; i < postacie.Count; i++)
-                {
-                    if (i == selectedIndex)
-                        Console.WriteLine($"       < {postacie[i]} >");
-                    else
-                        Console.WriteLine($"         {postacie[i]}");
-                }
-
-               
-
-                var key = Console.ReadKey(true);
-                switch (key.Key)
-                {
-                    case ConsoleKey.W:
-                        if (selectedIndex > 0) selectedIndex--;
-                        break;
-                    case ConsoleKey.S:
-                        if (selectedIndex < postacie.Count - 1) selectedIndex++;
-                        break;
-                    case ConsoleKey.A:
-                        showMenu = false; // przejście do opisu
-                        break;
-                    case ConsoleKey.Enter:
-                        Console.Clear();
-                        Console.WriteLine($"\nWybrałeś postać: {postacie[selectedIndex]}");
-                        Console.WriteLine("\nNaciśnij dowolny klawisz, aby zakończyć...");
-                        Console.ReadKey();
-                        return;
-                    case ConsoleKey.Escape:
-                        return;
-                }
-            }
-            else
-            {
-                // Wyświetl opis postaci
-                Console.Clear();
-                Console.WriteLine($"        OPIS POSTACI: {postacie[selectedIndex]}\n");
-
-                switch (postacie[selectedIndex])
-                {
-                    case "Uczeń":
-                        Console.WriteLine("  - Młody i chłonny wiedzy");
-                        Console.WriteLine("  - Niski poziom umiejętności");
-                        Console.WriteLine("  - Duży potencjał rozwoju");
-                        break;
-                    case "Maturzysta":
-                        Console.WriteLine("  - Wysoki stres, ale też determinacja");
-                        Console.WriteLine("  - Średni poziom umiejętności");
-                        Console.WriteLine("  - Gotów do podjęcia wyzwań");
-                        break;
-                    case "Profesor":
-                        Console.WriteLine("  - Doświadczony ekspert");
-                        Console.WriteLine("  - Wysoki poziom wiedzy");
-                        Console.WriteLine("  - Mało energii, ale ogromne możliwości");
-                        break;
-                }
-
-                Console.WriteLine("\n\n  [D] wróć");
-
-                var key = Console.ReadKey(true);
-                if (key.Key == ConsoleKey.D)
-                {
-                    showMenu = true;
-                }
-            }
-        }
-            /*
-            string[] options = { "Start Game", "Endless Mode", "Exit" };
-            int selected = 0;
-            ConsoleKey key;
-            void StartGame()
-            {
-             Console.WriteLine("Start game works");
-             }
-
-               void EndlessMode()
+             while (true)
              {
-              Console.WriteLine("Endless works");
-            }
-
-            do
-            {
-               Intro.ShowIntro();
-
-                 for (int i = 0; i < options.Length; i++)
+                 if (showMenu)
+                 {
+                     Console.Clear();
+                     Console.WriteLine("                   SELECT A CHARACTER\n");
+                         Console.WriteLine("                      [A]-Description");
+                     for (int i = 0; i < postacie.Count; i++)
                      {
-                     if (i == selected)
-                        {
-                      Console.ForegroundColor = ConsoleColor.DarkGray;
-                                Console.WriteLine("> " + options[i]);
-                                 Console.ResetColor();
-                        }
-                            else
-                                 {
-                    Console.WriteLine("  " + options[i]);
-                       }
-                         }
+                         if (i == selectedIndex)
+                             Console.WriteLine($"       < {postacie[i]} >");
+                         else
+                             Console.WriteLine($"         {postacie[i]}");
+                     }
 
-                     key = Console.ReadKey(true).Key;
 
-                   if (key == ConsoleKey.UpArrow)
-                       {
-                           selected = (selected == 0) ? options.Length - 1 : selected - 1;
+
+                     var key = Console.ReadKey(true);
+                     switch (key.Key)
+                     {
+                         case ConsoleKey.W:
+                             if (selectedIndex > 0) selectedIndex--;
+                             break;
+                         case ConsoleKey.S:
+                             if (selectedIndex < postacie.Count - 1) selectedIndex++;
+                             break;
+                         case ConsoleKey.A:
+                             showMenu = false; // przejście do opisu
+                             break;
+                         case ConsoleKey.Enter:
+                             Console.Clear();
+                             Console.WriteLine($"\nWybrałeś postać: {postacie[selectedIndex]}");
+                             Console.WriteLine("\nNaciśnij dowolny klawisz, aby zakończyć...");
+                             Console.ReadKey();
+                             return;
+                         case ConsoleKey.Escape:
+                             return;
+                     }
+                 }
+                 else
+                 {
+                     // Wyświetl opis postaci
+                     Console.Clear();
+                     Console.WriteLine($"        OPIS POSTACI: {postacie[selectedIndex]}\n");
+
+                     switch (postacie[selectedIndex])
+                     {
+                         case "Uczeń":
+                             Console.WriteLine("  - Młody i chłonny wiedzy");
+                             Console.WriteLine("  - Niski poziom umiejętności");
+                             Console.WriteLine("  - Duży potencjał rozwoju");
+                             break;
+                         case "Maturzysta":
+                             Console.WriteLine("  - Wysoki stres, ale też determinacja");
+                             Console.WriteLine("  - Średni poziom umiejętności");
+                             Console.WriteLine("  - Gotów do podjęcia wyzwań");
+                             break;
+                         case "Profesor":
+                             Console.WriteLine("  - Doświadczony ekspert");
+                             Console.WriteLine("  - Wysoki poziom wiedzy");
+                             Console.WriteLine("  - Mało energii, ale ogromne możliwości");
+                             break;
+                     }
+
+                     Console.WriteLine("\n\n  [D] wróć");
+
+                     var key = Console.ReadKey(true);
+                     if (key.Key == ConsoleKey.D)
+                     {
+                         showMenu = true;
+                     }
+                 }
+             }
+                 /*
+                 string[] options = { "Start Game", "Endless Mode", "Exit" };
+                 int selected = 0;
+                 ConsoleKey key;
+                 void StartGame()
+                 {
+                  Console.WriteLine("Start game works");
+                  }
+
+                    void EndlessMode()
+                  {
+                   Console.WriteLine("Endless works");
+                 }
+
+                 do
+                 {
+                    Intro.ShowIntro();
+
+                      for (int i = 0; i < options.Length; i++)
+                          {
+                          if (i == selected)
+                             {
+                           Console.ForegroundColor = ConsoleColor.DarkGray;
+                                     Console.WriteLine("> " + options[i]);
+                                      Console.ResetColor();
                              }
-                                    else if (key == ConsoleKey.DownArrow)
-                         {
-                                selected = (selected + 1) % options.Length;
-                       }
-                         }
-                   while (key != ConsoleKey.Enter);
+                                 else
+                                      {
+                         Console.WriteLine("  " + options[i]);
+                            }
+                              }
 
-                       switch (selected)
-                        {
-                              case 0:
-                           StartGame(); break;
-                                                                case 1:
-                                                                    EndlessMode(); break;
-                                                                case 2:
-                                                                    Environment.Exit(0); break;
-                                                            }
+                          key = Console.ReadKey(true).Key;
 
-                                                            */
+                        if (key == ConsoleKey.UpArrow)
+                            {
+                                selected = (selected == 0) ? options.Length - 1 : selected - 1;
+                                  }
+                                         else if (key == ConsoleKey.DownArrow)
+                              {
+                                     selected = (selected + 1) % options.Length;
+                            }
+                              }
+                        while (key != ConsoleKey.Enter);
+
+                            switch (selected)
+                             {
+                                   case 0:
+                                StartGame(); break;
+                                                                     case 1:
+                                                                         EndlessMode(); break;
+                                                                     case 2:
+                                                                         Environment.Exit(0); break;
+                                                                 }
+
+                                                                 */
 
 
-        }
+    
+
+
     

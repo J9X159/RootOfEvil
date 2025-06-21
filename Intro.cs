@@ -5,6 +5,26 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 /*
+static void DrawSkills()
+            //tutaj beda wszystkie skille ktore mozna ulepszac poprzez progresje poziomowa
+            {
+                Console.WriteLine("\n");
+                Console.WriteLine("                      <[ SKILLS ]>\n");
+                Console.WriteLine("                      * level : 4  ");
+                Console.WriteLine("                     * xp : 10/500");
+                Console.WriteLine("                  * remain points : 0\n");
+                Console.WriteLine("   Hack : 2");
+                Console.WriteLine("   Craft : 0");
+                Console.WriteLine("   Survival : 2\n");
+            }
+
+
+
+
+
+
+
+
 internal class Program
     {
         enum Tab
