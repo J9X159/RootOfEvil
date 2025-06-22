@@ -4,6 +4,48 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+
+public static class Intro
+{
+   public  static void ShowIntro()
+        {
+            Console.Clear();
+            string[] intro = new string[]
+            {
+                "\n",
+                "                     THE STORY BEGINS",
+                "\n",
+                "   ====================================================\n",
+                "   First of the three heroes was Amadeus, a wizard. Not\n",
+                "   Perhaps the bravest or the most powerful, but he was\n",
+                "   clever and sensible\n",
+                "\n",
+                "   Then there was Pontius the knight, fearless protector\n",
+                "   of the realm, who loved good food, drink and battle.\n",
+                "\n",
+                "   Last but not least was Zoya, a thief. She was\n",
+                "   mysterious and only seen as a passing shadow on a\n",
+                "   cloudy night.\n"
+            };
+
+            foreach (string line in intro)
+            {
+                foreach (char c in line)
+                {
+                    Console.Write(c);
+                    Thread.Sleep(2);
+                }
+                Console.WriteLine();
+            }
+
+            Thread.Sleep(2500);
+
+            Console.WriteLine("\n   Press ENTER to continue...");
+            Console.ReadLine();
+            Console.Clear();
+        }
+}
+
 /*
 static void DrawSkills()
             //tutaj beda wszystkie skille ktore mozna ulepszac poprzez progresje poziomowa
