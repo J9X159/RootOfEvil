@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-enum Tab
-{
-    Stats, Items, Skills, Quests, Shops, Settings
-}
-
+enum Tab { Stats, Items, Skills, Quests, Shops, Settings }
 enum ItemFocus { Title, Sort, Page, Item }
 enum ItemSortMode { Default, Alphabetical }
 enum SkillsFocus { Title, Skill }
@@ -58,9 +54,9 @@ class Program
     static int level = 4;
     static int xp = 10;
     static int remainingPoints = 3;
-  private static int selectedSkillIndex;
+    private static int selectedSkillIndex;
 
-  static void Main()
+    static void Main()
     {
         ShowIntro();
 
@@ -111,19 +107,20 @@ class Program
             {
                 Console.Clear();
 
-                if (viewingSkillDescription)
-{
-    DrawSkillDescription();
-    var KEY = Console.ReadKey(true);
-    HandleSkillsInput(KEY, tabs, ref currentTabIndex);
-    continue;
-}
+                if (viewingItemDescription)
+                {
+                    DrawItemDescription();
+                    var key = Console.ReadKey(true);
+                    if (key.Key == ConsoleKey.D)
+                        viewingItemDescription = false;
+                    continue;
+                }
 
                 if (viewingSkillDescription)
                 {
                     DrawSkillDescription();
                     var key = Console.ReadKey(true);
-                    if (key.Key == ConsoleKey.A)
+                    if (key.Key == ConsoleKey.D)
                         viewingSkillDescription = false;
                     continue;
                 }
@@ -170,11 +167,10 @@ class Program
         }
     }
 
-   static void HandleSkillsInput(ConsoleKeyInfo key, List<Tab> tabs, ref int currentTabIndex)
+    static void HandleSkillsInput(ConsoleKeyInfo key, List<Tab> tabs, ref int currentTabIndex)
 {
     if (viewingSkillDescription)
     {
-        // Tylko to ma działać, gdy jesteśmy w opisie
         if (key.Key == ConsoleKey.D)
         {
             viewingSkillDescription = false;
@@ -192,30 +188,32 @@ class Program
             }
             else if (skillsFocus == SkillsFocus.Skill)
             {
-                selectedSkillIndex = (selectedSkillIndex + 1) % 3;
+                if (selectedSkillIndex < 2) selectedSkillIndex++; // nie zawija
             }
             break;
 
         case ConsoleKey.W:
             if (skillsFocus == SkillsFocus.Skill)
             {
-                selectedSkillIndex = (selectedSkillIndex + 2) % 3; // wrap around
-            }
-            else if (skillsFocus == SkillsFocus.Skill)
-            {
-                skillsFocus = SkillsFocus.Title;
+                if (selectedSkillIndex > 0)
+                {
+                    selectedSkillIndex--; // nie zawija
+                }
+                else
+                {
+                    skillsFocus = SkillsFocus.Title; // wraca do tytułu
+                }
             }
             break;
 
         case ConsoleKey.A:
             if (skillsFocus == SkillsFocus.Skill)
             {
-                viewingSkillDescription = true;
+                viewingSkillDescription = true; // pokazuje opis
             }
             else if (skillsFocus == SkillsFocus.Title && currentTabIndex > 0)
             {
                 currentTabIndex--;
-                skillsFocus = SkillsFocus.Title;
             }
             break;
 
@@ -223,7 +221,6 @@ class Program
             if (skillsFocus == SkillsFocus.Title && currentTabIndex < tabs.Count - 1)
             {
                 currentTabIndex++;
-                skillsFocus = SkillsFocus.Title;
             }
             break;
 
@@ -237,15 +234,11 @@ class Program
                     case 2: survivalLevel++; break;
                 }
                 remainingPoints--;
-
-                // Reset focus, żeby można było zmieniać zakładki
-                skillsFocus = SkillsFocus.Title;
-                selectedSkillIndex = 0;
+                // nie resetujemy focusu — zostajesz na skillu
             }
             break;
     }
 }
-
 
     static void DrawSkillDescription()
 {
@@ -270,51 +263,41 @@ class Program
     Console.WriteLine($"\n  {description}");
     Console.WriteLine("\n  [D] - wróć");
 }
-
     static void DrawStats()
     {
         Console.WriteLine("\n");
         Console.WriteLine("                          STATS ]>\n");
-        Console.WriteLine("\n");
-        Console.WriteLine("   Health : 100 / 100\n");
-        Console.WriteLine("   Magicka : 100 / 100\n");
+        Console.WriteLine("   Health : 100 / 100");
+        Console.WriteLine("   Magicka : 100 / 100");
         Console.WriteLine("   Gold: 0");
     }
 
     static void DrawSkills()
-{
-    if (viewingSkillDescription)
     {
-        DrawSkillDescription();
-        return;
+        Console.WriteLine("\n");
+        Console.WriteLine(skillsFocus == SkillsFocus.Title ? "                      <[ SKILLS ]>\n" : "                         SKILLS\n");
+        Console.WriteLine($"                      * level : {level}");
+        Console.WriteLine($"                     * xp : {xp}/500");
+        Console.WriteLine($"                  * remain points : {remainingPoints}\n");
+
+        void DrawSkill(string name, int level, int index)
+        {
+            string prefix = (skillsFocus == SkillsFocus.Skill && selectedSkillIndex == index)
+            ? "[ " : "";
+            string suffix = (skillsFocus == SkillsFocus.Skill && selectedSkillIndex == index)
+            ? " ] [+] ([A]-description)" : "";
+            Console.WriteLine($"   {prefix}{name} : {level}{suffix}");
+        }
+
+        DrawSkill("Hack", hackLevel, 0);
+        DrawSkill("Craft", craftLevel, 1);
+        DrawSkill("Survival", survivalLevel, 2);
+
+        Console.WriteLine();
+
+        if (skillsFocus == SkillsFocus.Skill)
+           {}
     }
-
-    Console.WriteLine("\n");
-    Console.WriteLine(skillsFocus == SkillsFocus.Title
-        ? "                      <[ SKILLS ]>\n"
-        : "                         SKILLS\n");
-
-    Console.WriteLine($"                      * level : {level}");
-    Console.WriteLine($"                     * xp : {xp}/500");
-    Console.WriteLine($"                  * remain points : {remainingPoints}\n");
-
-    void DrawSkill(string name, int level, int index)
-    {
-        string prefix = (skillsFocus == SkillsFocus.Skill && selectedSkillIndex == index) ? "< " : "  ";
-        string suffix = (skillsFocus == SkillsFocus.Skill && selectedSkillIndex == index) ? " >" : "";
-        Console.WriteLine($"   {prefix}{name} : {level}{suffix}");
-    }
-
-    DrawSkill("Hack", hackLevel, 0);
-    DrawSkill("Craft", craftLevel, 1);
-    DrawSkill("Survival", survivalLevel, 2);
-
-    Console.WriteLine();
-
-    if (skillsFocus == SkillsFocus.Skill)
-        Console.WriteLine("   [ENTER] - Ulepsz | [A] - Opis");
-}
-
 
     static void DrawQuests()
     {
@@ -365,9 +348,9 @@ class Program
                     currentPage--;
                 else if (itemFocus == ItemFocus.Item && GetPageItems().Count > 0)
                     viewingItemDescription = true;
-                else if (itemFocus != ItemFocus.Item)
+                else if (itemFocus != ItemFocus.Item && currentTabIndex > 0)
                 {
-                    if (currentTabIndex > 0) currentTabIndex--;
+                    currentTabIndex--;
                     itemFocus = ItemFocus.Title;
                     selectedItemIndex = 0;
                     currentPage = 0;
@@ -379,9 +362,9 @@ class Program
                     currentSort = ItemSortMode.Alphabetical;
                 else if (itemFocus == ItemFocus.Page && currentPage < maxPage - 1)
                     currentPage++;
-                else if (itemFocus != ItemFocus.Item)
+                else if (itemFocus != ItemFocus.Item && currentTabIndex < tabs.Count - 1)
                 {
-                    if (currentTabIndex < tabs.Count - 1) currentTabIndex++;
+                    currentTabIndex++;
                     itemFocus = ItemFocus.Title;
                     selectedItemIndex = 0;
                     currentPage = 0;
@@ -411,18 +394,8 @@ class Program
         }
     }
 
-    static List<Item> GetSortedItems()
-    {
-        return currentSort == ItemSortMode.Alphabetical
-            ? items.OrderBy(i => i.Name).ToList()
-            : new List<Item>(items);
-    }
-
-    static List<Item> GetPageItems()
-    {
-        var sorted = GetSortedItems();
-        return sorted.Skip(currentPage * ITEMS_PER_PAGE).Take(ITEMS_PER_PAGE).ToList();
-    }
+    static List<Item> GetSortedItems() => currentSort == ItemSortMode.Alphabetical ? items.OrderBy(i => i.Name).ToList() : new List<Item>(items);
+    static List<Item> GetPageItems() => GetSortedItems().Skip(currentPage * ITEMS_PER_PAGE).Take(ITEMS_PER_PAGE).ToList();
 
     static void DrawItems()
     {
@@ -430,14 +403,12 @@ class Program
         Console.WriteLine(itemFocus == ItemFocus.Title ? "                       <[ ITEMS ]>\n" : "                          ITEMS\n");
 
         string sortLine = currentSort == ItemSortMode.Default ? "default" : "alphabetical";
-        Console.WriteLine(itemFocus == ItemFocus.Sort ?
-            $"                    < Sort : {sortLine} >" : $"                    Sort : {sortLine}");
+        Console.WriteLine(itemFocus == ItemFocus.Sort ? $"                    <[Sort : {sortLine}]>" : $"                    Sort : {sortLine}");
 
         int totalPages = (int)Math.Ceiling(GetSortedItems().Count / (double)ITEMS_PER_PAGE);
-        if (totalPages > 1)
-            Console.WriteLine(itemFocus == ItemFocus.Page ? $"   < page {currentPage + 1}/{totalPages} >" : $"   page {currentPage + 1}/{totalPages}");
-        else
-            Console.WriteLine("   page 1/1");
+        Console.WriteLine(totalPages > 1
+            ? itemFocus == ItemFocus.Page ? $"   <[page {currentPage + 1}/{totalPages}]>" : $"   page {currentPage + 1}/{totalPages}"
+            : "   page 1/1");
 
         if (itemFocus == ItemFocus.Item && GetPageItems().Count > 0)
             Console.WriteLine("                                [A] - description");
@@ -448,7 +419,7 @@ class Program
         for (int i = 0; i < pageItems.Count; i++)
         {
             if (itemFocus == ItemFocus.Item && i == selectedItemIndex)
-                Console.WriteLine($"   < {pageItems[i].DisplayName} >");
+                Console.WriteLine($"   [{pageItems[i].DisplayName}] [use]");
             else
                 Console.WriteLine($"   {pageItems[i].DisplayName}");
         }
@@ -462,12 +433,11 @@ class Program
         var item = GetPageItems()[selectedItemIndex];
         Console.Clear();
         Console.WriteLine("\n");
-        Console.WriteLine($"  {item.DisplayName}\n");
-        Console.WriteLine($"  {item.Description}");
-        Console.WriteLine("\n  [D] - wróć");
+        Console.WriteLine($"   {item.DisplayName}\n");
+        Console.WriteLine($"   {item.Description}");
+        Console.WriteLine("\n   [D] - wróć");
     }
 }
-
 
         /*
 
